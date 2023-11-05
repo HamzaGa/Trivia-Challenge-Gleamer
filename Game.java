@@ -1,32 +1,17 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Game
 {
-  List<Player> players = new ArrayList<>();
-
-  LinkedList popQuestions = new LinkedList();
-  LinkedList scienceQuestions = new LinkedList();
-  LinkedList sportsQuestions = new LinkedList();
-  LinkedList rockQuestions = new LinkedList();
+  private List<Player> players;
+  private QuestionProvider questionProvider;
 
   int currentPlayer = 0;
 
   public Game()
   {
-    for (int i = 0; i < 50; i++)
-    {
-      popQuestions.addLast("Pop Question " + i);
-      scienceQuestions.addLast(("Science Question " + i));
-      sportsQuestions.addLast(("Sports Question " + i));
-      rockQuestions.addLast(createRockQuestion(i));
-    }
-  }
-
-  public String createRockQuestion(int index)
-  {
-    return "Rock Question " + index;
+    players = new ArrayList<>();
+    questionProvider = new QuestionProvider();
   }
 
   public boolean isPlayable()
@@ -34,7 +19,7 @@ public class Game
     return players.size() >= 2;
   }
 
-  public void add(String playerName)
+  public void addPlayer(String playerName)
   {
     players.add(new Player(playerName));
     System.out.println(playerName + " was added");
@@ -59,40 +44,8 @@ public class Game
 
   private void askQuestion()
   {
-    System.out.println("The category is " + currentCategory());
-
-    if (currentCategory() == "Pop")
-      System.out.println(popQuestions.removeFirst());
-    if (currentCategory() == "Science")
-      System.out.println(scienceQuestions.removeFirst());
-    if (currentCategory() == "Sports")
-      System.out.println(sportsQuestions.removeFirst());
-    if (currentCategory() == "Rock")
-      System.out.println(rockQuestions.removeFirst());
-  }
-
-
-  private String currentCategory()
-  {
-    if (currentPlayer().getPosition() == 0)
-      return "Pop";
-    if (currentPlayer().getPosition() == 4)
-      return "Pop";
-    if (currentPlayer().getPosition() == 8)
-      return "Pop";
-    if (currentPlayer().getPosition() == 1)
-      return "Science";
-    if (currentPlayer().getPosition() == 5)
-      return "Science";
-    if (currentPlayer().getPosition() == 9)
-      return "Science";
-    if (currentPlayer().getPosition() == 2)
-      return "Sports";
-    if (currentPlayer().getPosition() == 6)
-      return "Sports";
-    if (currentPlayer().getPosition() == 10)
-      return "Sports";
-    return "Rock";
+    System.out.println("The category is " + questionProvider.getCategoryByPlayerPosition(currentPlayer().getPosition()));
+    System.out.println(questionProvider.getQuestionByPlayerPosition(currentPlayer().getPosition()));
   }
 
   public void handleAnswerNature(boolean isCorrectAnswer)
