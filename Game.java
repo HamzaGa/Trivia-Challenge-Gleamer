@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game
 {
@@ -14,11 +15,18 @@ public class Game
     questionProvider = new QuestionProvider();
   }
 
+  /**
+   * @return true if there is more than one player in the game; false otherwise.
+   */
   public boolean isPlayable()
   {
     return players.size() >= 2;
   }
 
+  /**
+   * Creates a new player and adds it to the game.
+   * @param playerName player's name to add
+   */
   public void addPlayer(String playerName)
   {
     players.add(new Player(playerName));
@@ -26,8 +34,14 @@ public class Game
     System.out.println("They are " + players.size() + " total players");
   }
 
-  public void roll(int roll)
+  /**
+   * Rolls a dice (1-6)
+   * If the player is in penalty box and gets an even number, he remains suspended
+   * Otherwise, he gets flagged as mayGetOutOfPenaltyBox, his position gets changed according to the roll result and he gets asked a question
+   */
+  public void roll()
   {
+    int roll = ThreadLocalRandom.current().nextInt(1, 7);
     System.out.println(currentPlayer() + " is the current player");
     System.out.println("They have rolled a " + roll);
 
@@ -42,12 +56,22 @@ public class Game
     askQuestion();
   }
 
+  /**
+   * Prints the question category corresponding to the current player's position
+   * Prints a question from that category
+   */
   private void askQuestion()
   {
     System.out.println("The category is " + questionProvider.getCategoryByPlayerPosition(currentPlayer().getPosition()));
     System.out.println(questionProvider.getQuestionByPlayerPosition(currentPlayer().getPosition()));
   }
 
+  /**
+   * If the player provides a wrong answer, he goes to the penalty box, the turn passes.
+   * If the player provides a correct answer, is already in the penalty box, and is not marked as mayGetOutOfPenaltyBox, he remains suspended and the turn passes.
+   * Otherwise, the player gets rewarded. We end the game if he is a winner. The turn passes otherwise.
+   * @param isCorrectAnswer a boolean input to indicate whether the player has correctly answered the question or not
+   */
   public void handleAnswerNature(boolean isCorrectAnswer)
   {
     if(!isCorrectAnswer){
@@ -66,7 +90,7 @@ public class Game
 
     System.out.println("Answer was correct!!!!");
     currentPlayer().rewardAndNotify();
-    if (didPlayerWin())
+    if (didPlayerWin(currentPlayer()))
     {
       System.out.println("******** Congratulations " + currentPlayer().getName() + " You won!!! ********");
       System.exit(0);
@@ -74,11 +98,17 @@ public class Game
     turnPass();
   }
 
+  /**
+   * @return Player the player that has the turn.
+   */
   private Player currentPlayer()
   {
     return players.get(currentPlayer);
   }
 
+  /**
+   * Changes the current player
+   */
   private void turnPass()
   {
     currentPlayer++;
@@ -86,8 +116,12 @@ public class Game
       currentPlayer = 0;
   }
 
-  private boolean didPlayerWin()
+  /**
+   * @param candidate the player that is a candidate for win check
+   * @return true if the candidate is a winner, false otherwise.
+   */
+  private boolean didPlayerWin(Player candidate)
   {
-    return currentPlayer().getCoins() == 6;
+    return candidate.getCoins() == 6;
   }
 }
