@@ -1,0 +1,5 @@
+1. Code deduplication (Turn passing, Dice rolling)
+2. Separation of concerns (Player attributes and question management => Player class, QuestionProvider class)
+3. Win condition is irrelevant (inversed)
+4. Bad naming and factoring (wasCorrectlyAnswered, wrongAnswered ==> merged)
+5. Nested conditions & complex combinations, not human friendly neither functional oriented code
